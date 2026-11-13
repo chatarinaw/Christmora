@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Christmora — A Little Christmas Gift Made by You</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "DM Sans", sans-serif;
+      background: #edf5fa;
+      color: #243b50;
+      min-height: 100vh;
+    }
+
+    button, input, textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .background {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(circle at 10% 10%, #ffffff 0, transparent 30%),
+        radial-gradient(circle at 90% 80%, #d2e7f4 0, transparent 35%),
+        linear-gradient(135deg, #f5faff, #e2eff8);
+    }
+
+    .snow {
+      position: fixed;
+      top: 12%;
+      left: 7%;
+      color: #b5d0e2;
+      font-size: 30px;
+      pointer-events: none;
+    }
+
+    .snow.second {
+      top: 75%;
+      left: 90%;
+      font-size: 42px;
+    }
+
+    .container {
+      width: min(900px, 92%);
+      margin: auto;
+      padding: 35px 0 60px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .logo {
+      font-family: "Playfair Display", serif;
+      font-size: 38px;
+      color: #254c69;
+      letter-spacing: 1px;
+    }
+
+    .tagline {
+      color: #718da2;
+      font-size: 13px;
+      margin-top: 6px;
+      letter-spacing: 1px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid #d9e8f2;
+      border-radius: 22px;
+      padding: 30px;
+      box-shadow: 0 12px 35px rgba(57, 91, 119, 0.08);
+      margin-bottom: 20px;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 55px 30px;
+    }
+
+    .hero-icon {
+      font-size: 55px;
+      margin-bottom: 15px;
+    }
+
+    h1, h2, h3 {
+      font-family: "Playfair Display", serif;
+      color: #254c69;
+    }
+
+    h1 {
+      font-size: 35px;
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      font-size: 25px;
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      font-size: 19px;
+      margin-bottom: 12px;
+    }
+
+    p {
+      line-height: 1.7;
+      color: #6b8294;
+    }
+
+    .hero p {
+      max-width: 520px;
+      margin: auto;
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+ 
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid #9bb9cc;
+  border-radius: 50px;
+  padding: 13px 25px;
+  background: linear-gradient(135deg, #527c99, #759bb4);
+  color: #fffdf8;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  box-shadow: 0 5px 12px rgba(70, 105, 130, 0.13);
+  transition: all 0.3s ease;
+}
+
+.btn::before {
+  content: "✧";
+  font-size: 13px;
+  color: #e7f2f8;
+}
+
+.btn:hover {
+  background: linear-gradient(135deg, #416985, #648ba7);
+  box-shadow: 0 8px 18px rgba(70, 105, 130, 0.2);
+  transform: translateY(-2px);
+}
+
+.btn.secondary {
+  background: #f8fbfd;
+  color: #557990;
+  border: 1px solid #c5d9e6;
+  box-shadow: none;
+}
+
+.btn.secondary::before {
+  color: #91b3c9;
+}
+
+.btn.secondary:hover {
+  background: #eaf3f8;
+  border-color: #9bb9cc;
+  transform: translateY(-2px);
+}
+
+    .form-group {
+      margin: 18px 0;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 8px;
+      color: #3b5a72;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #d3e2ec;
+      border-radius: 11px;
+      background: #fbfdff;
+      color: #243b50;
+      outline: none;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #719bb8;
+      box-shadow: 0 0 0 3px rgba(113, 155, 184, 0.12);
+    }
+
+    textarea {
+      min-height: 130px;
+      resize: vertical;
+    }
+
+    .small-note {
+      font-size: 12px;
+      margin-top: 7px;
+      color: #8297a7;
+    }
+
+    .question-card {
+      background: #f3f8fc;
+      border: 1px solid #dce9f2;
+      border-radius: 15px;
+      padding: 18px;
+      margin: 15px 0;
+    }
+
+    .question-card input {
+      margin-bottom: 9px;
+    }
+
+    .question-card .correct-label {
+      font-size: 12px;
+      margin: 5px 0 10px;
+    }
+
+    .question-card select {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid #d3e2ec;
+      border-radius: 10px;
+      background: white;
+      color: #315f7e;
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .photo-item {
+      background: white;
+      border: 1px solid #dce9f2;
+      border-radius: 14px;
+      padding: 10px;
+      overflow: hidden;
+    }
+
+    .photo-item img {
+      width: 100%;
+      height: 145px;
+      object-fit: cover;
+      border-radius: 9px;
+    }
+
+    .photo-item p {
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .letter-paper {
+      background: #fffefa;
+      border: 1px solid #eee6d8;
+      border-radius: 15px;
+      padding: 28px;
+      line-height: 1.9;
+      white-space: pre-wrap;
+      color: #5a5147;
+      margin-top: 15px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .message {
+      padding: 13px;
+      border-radius: 10px;
+      background: #eaf4fa;
+      color: #315f7e;
+      font-size: 13px;
+      margin-top: 15px;
+      overflow-wrap: anywhere;
+    }
+
+    .quiz-option {
+      display: block;
+      background: #f2f7fb;
+      border: 1px solid #dce9f2;
+      padding: 12px;
+      border-radius: 10px;
+      margin: 9px 0;
+      cursor: pointer;
+    }
+
+    .quiz-option input {
+      width: auto;
+      margin-right: 8px;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    footer {
+      text-align: center;
+      color: #8aa0b0;
+      font-size: 12px;
+      margin-top: 35px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        width: 94%;
+        padding-top: 25px;
+      }
+
+      .logo {
+        font-size: 32px;
+      }
+
+      .card {
+        padding: 21px;
+      }
+
+      .hero {
+        padding: 40px 20px;
+      }
+
+      h1 {
+        font-size: 29px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="background"></div>
+  <div class="snow">✧</div>
+  <div class="snow second">❄</div>
+
+  <main class="container">
+
+    <header>
+      <div class="logo">Christmora</div>
+      <div class="tagline">A Little Christmas Gift Made by You</div>
+    </header>
+
+    <!-- HOME PAGE -->
+    <section id="homePage" class="card hero">
+      <div class="hero-icon">❄️</div>
+      <h1>A Little Christmas Magic</h1>
+      <p>
+        Create a little surprise filled with letters, memories,
+        and moments worth remembering. Make this Christmas more meaningful.
+      </p>
+
+      <div class="button-group">
+        <button class="btn" onclick="showCreator()">
+          Create a Gift
+        </button>
+      </div>
+    </section>
+
+    <!-- CREATOR PAGE -->
+    <section id="creatorPage" class="hidden">
+
+      <div class="card">
+        <h2>Create Your Christmas Gift</h2>
+        <p>Let's make something special for someone you care about.</p>
+
+        <div class="form-group">
+          <label>Your Name</label>
+          <input id="senderInput" placeholder="Enter your name">
+        </div>
+
+        <div class="form-group">
+          <label>Recipient's Name</label>
+          <input id="recipientInput" placeholder="Who is this gift for?">
+        </div>
+
+        <div class="form-group">
+          <label>Greeting</label>
+          <input id="greetingInput" placeholder="Merry Christmas!">
+        </div>
+
+        <div class="form-group">
+          <label>Letter Title</label>
+          <input id="letterTitleInput" placeholder="A Letter for You">
+        </div>
+
+        <div class="form-group">
+          <label>Your Letter</label>
+          <textarea id="letterInput" placeholder="Write your Christmas letter here..."></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Memory Gallery</h2>
+        <p>Add photos that hold special memories.</p>
+
+        <div class="form-group">
+          <label>Choose Photos</label>
+          <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+          <p class="small-note">
+            Maximum 10 MB per photo. Supported formats: JPG, PNG, WEBP.
+          </p>
+        </div>
+
+        <div id="photoPreview" class="photo-grid"></div>
+      </div>
+
+      <div class="card">
+        <h2>A Little Memory Quiz</h2>
+        <p>Create questions that only your recipient might know.</p>
+
+        <div id="quizCreator"></div>
+
+        <button class="btn secondary" onclick="addQuestion()">
+          + Add Question
+        </button>
+
+        <p class="small-note">Maximum 10 questions, with 3 answer choices each.</p>
+      </div>
+
+      <div class="card center">
+        <h2>Ready to Share?</h2>
+        <p>Your gift will receive its own unique link.</p>
+
+        <button id="createGiftButton" class="btn" onclick="createGift()">
+          Create My Gift
+        </button>
+
+        <div id="creatorMessage"></div>
+      </div>
+    </section>
+
+    <!-- LINK RESULT PAGE -->
+    <section id="linkPage" class="card hidden center">
+      <div class="hero-icon">🎁</div>
+      <h2>Your Gift Is Ready!</h2>
+      <p>Share this special link with your recipient.</p>
+
+      <div id="generatedLink" class="message"></div>
+
+      <div class="button-group">
+        <button class="btn" onclick="copyGiftLink()">Copy Link</button>
+        <button class="btn secondary" onclick="goHome()">Home</button>
+      </div>
+    </section>
+
+    <!-- RECIPIENT PAGE -->
+    <section id="recipientPage" class="hidden">
+
+      <div class="card hero">
+        <div class="hero-icon">🎄</div>
+        <h1 id="recipientGreeting">Merry Christmas!</h1>
+        <p id="recipientIntro"></p>
+      </div>
+
+      <div class="card center">
+        <h2>A Gift Made for You</h2>
+        <p>There are a few little surprises waiting for you.</p>
+
+        <div class="button-group">
+          <button class="btn" onclick="openLetter()">
+            Read My Letter
+          </button>
+
+          <button class="btn secondary" onclick="openMemories()">
+            View Memories
+          </button>
+
+          <button class="btn secondary" onclick="openQuiz()">
+            Take the Quiz
+          </button>
+        </div>
+      </div>
+
+      <div id="letterSection" class="card hidden">
+        <h2 id="recipientLetterTitle"></h2>
+        <p id="recipientLetterGreeting"></p>
+        <div id="recipientLetter" class="letter-paper"></div>
+      </div>
+
+      <div id="memorySection" class="card hidden">
+        <h2>Our Little Memories</h2>
+        <div id="recipientPhotos" class="photo-grid"></div>
+      </div>
+
+      <div id="quizSection" class="card hidden">
+        <h2>A Little Memory Quiz</h2>
+        <p>Let's see how well you remember!</p>
+
+        <div id="quizQuestions"></div>
+
+        <button id="submitQuizButton" class="btn" onclick="submitQuiz()">
+          Submit Answers
+        </button>
+
+        <div id="quizResult"></div>
+      </div>
+    </section>
+
+    <!-- ERROR PAGE -->
+    <section id="errorPage" class="card hero hidden">
+      <div class="hero-icon">❄️</div>
+      <h2>Gift Not Found</h2>
+      <p>This link may be incorrect or the gift may no longer be available.</p>
+      <div class="button-group">
+        <button class="btn" onclick="goHome()">Back to Home</button>
+      </div>
+    </section>
+
+    <footer>
+      Made with love and a little Christmas magic · Christmora
+    </footer>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
