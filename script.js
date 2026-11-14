@@ -8,17 +8,22 @@ let selectedPhotos = [];
 let currentGift = null;
 let lastGeneratedLink = "";
 
-
 // =====================================
 // PAGE NAVIGATION
 // =====================================
 
 function hideAllPages() {
-  document.getElementById("homePage").classList.add("hidden");
-  document.getElementById("creatorPage").classList.add("hidden");
-  document.getElementById("linkPage").classList.add("hidden");
-  document.getElementById("recipientPage").classList.add("hidden");
-  document.getElementById("errorPage").classList.add("hidden");
+  const pages = [
+    "homePage",
+    "creatorPage",
+    "linkPage",
+    "recipientPage",
+    "errorPage"
+  ];
+
+  pages.forEach(function(id) {
+    document.getElementById(id).classList.add("hidden");
+  });
 }
 
 function showCreator() {
@@ -40,6 +45,68 @@ function showError() {
   document.getElementById("errorPage").classList.remove("hidden");
 }
 
+// =====================================
+// SMOOTH SECTION ANIMATION + AUTO SCROLL
+// =====================================
+
+function toggleSection(sectionID) {
+  const section = document.getElementById(sectionID);
+
+  if (!section) {
+    return;
+  }
+
+  // If the section is currently hidden, open it.
+  if (section.classList.contains("hidden")) {
+    section.classList.remove("hidden");
+    section.classList.remove("section-exit");
+    section.classList.remove("section-reveal");
+
+    // Restart the opening animation.
+    void section.offsetWidth;
+
+    section.classList.add("section-reveal");
+
+    // Automatically scroll to the opened section.
+    requestAnimationFrame(function() {
+      section.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+        block: "start"
+      });
+    });
+
+    return;
+  }
+
+  // If the section is visible, close it smoothly.
+  section.classList.remove("section-reveal");
+  section.classList.remove("section-exit");
+
+  // Restart the closing animation.
+  void section.offsetWidth;
+
+  section.classList.add("section-exit");
+
+  let finished = false;
+
+  function finishClosing() {
+    if (finished) {
+      return;
+    }
+
+    finished = true;
+    section.classList.remove("section-exit");
+    section.classList.add("hidden");
+  }
+
+  // Close after the animation finishes.
+  section.addEventListener("animationend", finishClosing, { once: true });
+
+  // Fallback for devices with reduced motion enabled.
+  setTimeout(finishClosing, 300);
+}
 
 // =====================================
 // QUIZ CREATOR
@@ -86,7 +153,6 @@ function addQuestion() {
   document.getElementById("quizCreator").appendChild(card);
 }
 
-
 // =====================================
 // PHOTO PREVIEW
 // =====================================
@@ -110,7 +176,10 @@ document.getElementById("photoInput").addEventListener("change", function(event)
       continue;
     }
 
-    selectedPhotos.push(file);
+    selectedPhotos.push({
+      file: file,
+      caption: ""
+    });
   }
 
   event.target.value = "";
@@ -122,8 +191,8 @@ function showPhotoPreview() {
 
   preview.innerHTML = "";
 
-  selectedPhotos.forEach(function(file, index) {
-    const imageURL = URL.createObjectURL(file);
+  selectedPhotos.forEach(function(photo, index) {
+    const imageURL = URL.createObjectURL(photo.file);
 
     const item = document.createElement("div");
     item.className = "photo-item";
@@ -133,18 +202,37 @@ function showPhotoPreview() {
     image.alt = "Photo preview";
 
     const name = document.createElement("p");
-    name.textContent = file.name;
+    name.textContent = photo.file.name;
 
+    // CAPTION INPUT
+    const captionLabel = document.createElement("label");
+    captionLabel.textContent = "Photo Caption";
+    captionLabel.style.marginTop = "12px";
+
+    const captionInput = document.createElement("input");
+    captionInput.type = "text";
+    captionInput.placeholder = "Write a little memory...";
+    captionInput.value = photo.caption;
+    captionInput.maxLength = 150;
+
+    captionInput.addEventListener("input", function() {
+      selectedPhotos[index].caption = captionInput.value;
+    });
+
+    // REMOVE BUTTON
     const removeButton = document.createElement("button");
     removeButton.className = "btn secondary";
     removeButton.type = "button";
     removeButton.textContent = "Remove";
+
     removeButton.addEventListener("click", function() {
       removePhoto(index);
     });
 
     item.appendChild(image);
     item.appendChild(name);
+    item.appendChild(captionLabel);
+    item.appendChild(captionInput);
     item.appendChild(removeButton);
 
     preview.appendChild(item);
@@ -155,7 +243,6 @@ function removePhoto(index) {
   selectedPhotos.splice(index, 1);
   showPhotoPreview();
 }
-
 
 // =====================================
 // COLLECT QUIZ DATA
@@ -192,7 +279,6 @@ function collectQuiz() {
   return quiz;
 }
 
-
 // =====================================
 // UPLOAD PHOTOS TO SUPABASE
 // =====================================
@@ -201,7 +287,8 @@ async function uploadPhotos(giftID) {
   const memories = [];
 
   for (let i = 0; i < selectedPhotos.length; i++) {
-    const file = selectedPhotos[i];
+    const photo = selectedPhotos[i];
+    const file = photo.file;
 
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
 
@@ -222,13 +309,13 @@ async function uploadPhotos(giftID) {
 
     memories.push({
       url: data.publicUrl,
-      name: file.name
+      name: file.name,
+      caption: photo.caption.trim()
     });
   }
 
   return memories;
 }
-
 
 // =====================================
 // CREATE GIFT
@@ -308,7 +395,6 @@ async function createGift() {
   }
 }
 
-
 // =====================================
 // COPY GIFT LINK
 // =====================================
@@ -321,7 +407,6 @@ async function copyGiftLink() {
     alert("Unable to copy. Please copy the link manually.");
   }
 }
-
 
 // =====================================
 // LOAD RECIPIENT GIFT
@@ -350,7 +435,6 @@ async function loadGift(giftID) {
     showError();
   }
 }
-
 
 // =====================================
 // DISPLAY RECIPIENT PAGE
@@ -381,15 +465,13 @@ function showRecipientGift() {
   showRecipientQuiz();
 }
 
-
 // =====================================
 // OPEN LETTER
 // =====================================
 
 function openLetter() {
-  document.getElementById("letterSection").classList.toggle("hidden");
+  toggleSection("letterSection");
 }
-
 
 // =====================================
 // OPEN MEMORY GALLERY
@@ -403,39 +485,124 @@ function openMemories() {
     return;
   }
 
-  document.getElementById("memorySection").classList.toggle("hidden");
+  toggleSection("memorySection");
 }
-
 
 // =====================================
 // DISPLAY PHOTOS
 // =====================================
 
 function showRecipientPhotos() {
-  const gallery = document.getElementById("recipientPhotos");
+  const container = document.getElementById("recipientPhotos");
 
-  gallery.innerHTML = "";
+  container.innerHTML = "";
 
-  const memories = currentGift.memories || [];
-
-  if (memories.length === 0) {
-    document.getElementById("memorySection").classList.add("hidden");
+  if (!currentGift.memories || currentGift.memories.length === 0) {
+    container.textContent = "No memories available yet.";
     return;
   }
 
-  memories.forEach(function(memory) {
-    const item = document.createElement("div");
-    item.className = "photo-item";
+  currentGift.memories.forEach(function(memory, index) {
+    const card = document.createElement("button");
 
-    const image = document.createElement("img");
-    image.src = memory.url;
-    image.alt = "A shared memory";
+    card.type = "button";
+    card.className = "photo-item polaroid-card";
 
-    item.appendChild(image);
-    gallery.appendChild(item);
+    const img = document.createElement("img");
+    img.src = memory.url;
+    img.alt = memory.caption || memory.name || "Christmas memory";
+    img.loading = "lazy";
+
+    const caption = document.createElement("p");
+    caption.className = "polaroid-caption";
+
+    const fallbackName = memory.name || `Memory ${index + 1}`;
+
+    caption.textContent =
+      memory.caption && memory.caption.trim()
+        ? memory.caption.trim()
+        : fallbackName.replace(/\.[^/.]+$/, "");
+
+    card.appendChild(img);
+    card.appendChild(caption);
+
+    card.addEventListener("click", () => {
+      openPhotoLightbox(memory.url, caption.textContent);
+    });
+
+    container.appendChild(card);
   });
 }
 
+// =====================================
+// OPEN PHOTO LIGHTBOX
+// =====================================
+
+function openPhotoLightbox(photoUrl, captionText) {
+  let lightbox = document.getElementById("photoLightbox");
+
+  if (!lightbox) {
+    lightbox = document.createElement("div");
+    lightbox.id = "photoLightbox";
+    lightbox.className = "photo-lightbox";
+
+    const content = document.createElement("div");
+    content.className = "lightbox-content";
+
+    const closeButton = document.createElement("button");
+    closeButton.className = "lightbox-close";
+    closeButton.type = "button";
+    closeButton.textContent = "×";
+    closeButton.setAttribute("aria-label", "Close photo");
+
+    const image = document.createElement("img");
+    image.className = "lightbox-image";
+
+    const caption = document.createElement("p");
+    caption.className = "lightbox-caption";
+
+    content.appendChild(closeButton);
+    content.appendChild(image);
+    content.appendChild(caption);
+
+    lightbox.appendChild(content);
+    document.body.appendChild(lightbox);
+
+    closeButton.addEventListener("click", closePhotoLightbox);
+
+    lightbox.addEventListener("click", (event) => {
+      if (event.target === lightbox) {
+        closePhotoLightbox();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closePhotoLightbox();
+      }
+    });
+  }
+
+  lightbox.querySelector(".lightbox-image").src = photoUrl;
+  lightbox.querySelector(".lightbox-caption").textContent = captionText;
+
+  lightbox.classList.add("active");
+  document.body.style.overflow = "hidden";
+}
+
+// =====================================
+// CLOSE PHOTO LIGHTBOX
+// =====================================
+
+function closePhotoLightbox() {
+  const lightbox = document.getElementById("photoLightbox");
+
+  if (lightbox) {
+    lightbox.classList.remove("active");
+  }
+
+  document.body.style.overflow = "";
+}
 
 // =====================================
 // DISPLAY QUIZ
@@ -477,10 +644,13 @@ function showRecipientQuiz() {
   });
 }
 
-function openQuiz() {
-  document.getElementById("quizSection").classList.toggle("hidden");
-}
+// =====================================
+// OPEN QUIZ
+// =====================================
 
+function openQuiz() {
+  toggleSection("quizSection");
+}
 
 // =====================================
 // SUBMIT QUIZ
@@ -518,7 +688,6 @@ function submitQuiz() {
     "You got " + score + " out of " + quiz.length +
     " questions correct! 🎄";
 }
-
 
 // =====================================
 // CHECK URL WHEN WEBSITE OPENS
